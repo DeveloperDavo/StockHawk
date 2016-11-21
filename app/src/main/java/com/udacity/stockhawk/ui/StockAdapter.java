@@ -2,6 +2,7 @@ package com.udacity.stockhawk.ui;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -130,9 +131,17 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
             cursor.moveToPosition(adapterPosition);
             int symbolColumn = cursor.getColumnIndex(Contract.Quote.COLUMN_SYMBOL);
             clickHandler.onClick(cursor.getString(symbolColumn));
-            context.startActivity(DetailActivity.newIntent(context));
+            final String history = cursor.getString(Contract.Quote.POSITION_HISTORY);
+            final HistoryValues[] data = convertToData(history);
+
+            final Intent intent = DetailActivity.newIntent(context, data);
+            context.startActivity(intent);
         }
 
+        private HistoryValues[] convertToData(String history) {
+            return new HistoryValues[]{new HistoryValues(0, 0), new HistoryValues(5, 3), new HistoryValues(10, 10)};
+        }
 
     }
+
 }

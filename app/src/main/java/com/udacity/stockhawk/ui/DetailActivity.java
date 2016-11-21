@@ -3,6 +3,7 @@ package com.udacity.stockhawk.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -19,11 +20,20 @@ import butterknife.ButterKnife;
 
 public class DetailActivity extends AppCompatActivity {
 
+    public static final String KEY = "data";
     @BindView(R.id.chart)
     LineChart lineChart;
 
-    public static Intent newIntent(Context context) {
-        return new Intent(context, DetailActivity.class);
+    private HistoryValues[] data;
+
+    /* Required empty constructor */
+    public DetailActivity() {
+    }
+
+    public static Intent newIntent(Context context, HistoryValues[] data) {
+        final Intent intent = new Intent(context, DetailActivity.class);
+        intent.putExtra(KEY, data);
+        return intent;
     }
 
     @Override
@@ -33,14 +43,16 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
-        YourData[] dataObjects = new YourData[]{new YourData(0, 0), new YourData(5, 3), new YourData(10, 10)};
+        Parcelable[] dataObjects = getIntent().getParcelableArrayExtra(KEY);
 
         List<Entry> entries = new ArrayList<>();
 
-        for (YourData data : dataObjects) {
+        for (Parcelable data : dataObjects) {
 
             // turn your data into Entry objects
-            entries.add(new Entry(data.getX(), data.getY()));
+            if (data instanceof HistoryValues) {
+                entries.add(new Entry(((HistoryValues) data).getTime(), ((HistoryValues) data).getPrice()));
+            }
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
