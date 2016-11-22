@@ -6,27 +6,27 @@ import android.os.Parcelable;
 /**
  * Created by David on 21/11/2016.
  */
-class HistoryValues implements Parcelable {
+final class HistoryValues implements Parcelable {
 
-    private int time;
-    private int price;
+    private long timeInMillis;
+    private double priceInUSD;
 
-    public HistoryValues(int x, int y) {
-        this.time = x;
-        this.price = y;
+    HistoryValues(long timeInMillis, double priceInUSD) {
+        this.timeInMillis = timeInMillis;
+        this.priceInUSD = priceInUSD;
     }
 
-    public HistoryValues(Parcel in) {
-        time = in.readInt();
-        price = in.readInt();
+    private HistoryValues(Parcel in) {
+        timeInMillis = in.readLong();
+        priceInUSD = in.readDouble();
     }
 
-    public int getTime() {
-        return time;
+    long getTimeInMillis() {
+        return timeInMillis;
     }
 
-    public int getPrice() {
-        return price;
+    double getPriceInUSD() {
+        return priceInUSD;
     }
 
     @Override
@@ -36,8 +36,8 @@ class HistoryValues implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(time);
-        parcel.writeInt(price);
+        parcel.writeLong(timeInMillis);
+        parcel.writeDouble(priceInUSD);
     }
 
     public static final Parcelable.Creator<HistoryValues> CREATOR

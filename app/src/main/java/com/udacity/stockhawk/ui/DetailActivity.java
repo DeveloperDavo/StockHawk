@@ -51,7 +51,7 @@ public class DetailActivity extends AppCompatActivity {
 
             // turn your data into Entry objects
             if (data instanceof HistoryValues) {
-                entries.add(new Entry(((HistoryValues) data).getTime(), ((HistoryValues) data).getPrice()));
+                entries.add(new Entry(((HistoryValues) data).getTimeInMillis(), (float) ((HistoryValues) data).getPriceInUSD()));
             }
         }
 

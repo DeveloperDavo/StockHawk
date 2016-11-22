@@ -16,6 +16,8 @@ import com.udacity.stockhawk.data.PrefUtils;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -133,13 +135,27 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
             clickHandler.onClick(cursor.getString(symbolColumn));
             final String history = cursor.getString(Contract.Quote.POSITION_HISTORY);
             final HistoryValues[] data = convertToData(history);
-
             final Intent intent = DetailActivity.newIntent(context, data);
             context.startActivity(intent);
         }
 
-        private HistoryValues[] convertToData(String history) {
-            return new HistoryValues[]{new HistoryValues(0, 0), new HistoryValues(5, 3), new HistoryValues(10, 10)};
+        private HistoryValues[] convertToData(final String history) {
+            List<HistoryValues> historyValuesList = new ArrayList<>();
+
+            final String[] historyWithoutLineBreaksArray = history.split("\n");
+            for (final String historyWithoutLineBreaks : historyWithoutLineBreaksArray) {
+                final String[] historyValuesStringArray = historyWithoutLineBreaks.split(", ");
+                final String timeAsString = historyValuesStringArray[0];
+                final long timeInMillis = Long.parseLong(timeAsString);
+                final String priceAsString = historyValuesStringArray[1];
+                final double priceInUSD = Double.parseDouble(priceAsString);
+                final HistoryValues historyValues = new HistoryValues(timeInMillis, priceInUSD);
+                historyValuesList.add(historyValues);
+            }
+//            return new HistoryValues[]{new HistoryValues(0, 0), new HistoryValues(5, 3), new HistoryValues(10, 10)};
+            final HistoryValues[] historyValuesArray = historyValuesList.toArray(new HistoryValues[historyValuesList.size()]);
+            return historyValuesArray;
+
         }
 
     }
