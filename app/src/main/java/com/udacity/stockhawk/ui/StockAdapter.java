@@ -133,13 +133,14 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
             cursor.moveToPosition(adapterPosition);
             int symbolColumn = cursor.getColumnIndex(Contract.Quote.COLUMN_SYMBOL);
             clickHandler.onClick(cursor.getString(symbolColumn));
+
             final String history = cursor.getString(Contract.Quote.POSITION_HISTORY);
-            final HistoryValues[] data = convertToData(history);
+            final List<HistoryValues> data = convertToData(history);
             final Intent intent = DetailActivity.newIntent(context, data);
             context.startActivity(intent);
         }
 
-        private HistoryValues[] convertToData(final String history) {
+        private List<HistoryValues> convertToData(final String history) {
             List<HistoryValues> historyValuesList = new ArrayList<>();
 
             final String[] historyWithoutLineBreaksArray = history.split("\n");
@@ -152,10 +153,7 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
                 final HistoryValues historyValues = new HistoryValues(timeInMillis, priceInUSD);
                 historyValuesList.add(historyValues);
             }
-//            return new HistoryValues[]{new HistoryValues(0, 0), new HistoryValues(5, 3), new HistoryValues(10, 10)};
-            final HistoryValues[] historyValuesArray = historyValuesList.toArray(new HistoryValues[historyValuesList.size()]);
-            return historyValuesArray;
-
+            return historyValuesList;
         }
 
     }

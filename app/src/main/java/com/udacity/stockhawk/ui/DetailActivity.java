@@ -10,9 +10,11 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.EntryXComparator;
 import com.udacity.stockhawk.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -30,9 +32,9 @@ public class DetailActivity extends AppCompatActivity {
     public DetailActivity() {
     }
 
-    public static Intent newIntent(Context context, HistoryValues[] data) {
+    public static Intent newIntent(Context context, List<HistoryValues> data) {
         final Intent intent = new Intent(context, DetailActivity.class);
-        intent.putExtra(KEY, data);
+        intent.putParcelableArrayListExtra(KEY, (ArrayList<? extends Parcelable>) data);
         return intent;
     }
 
@@ -43,18 +45,15 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
-        Parcelable[] dataObjects = getIntent().getParcelableArrayExtra(KEY);
+        List<HistoryValues> dataObjects = getIntent().getParcelableArrayListExtra(KEY);
 
         List<Entry> entries = new ArrayList<>();
-
-        for (Parcelable data : dataObjects) {
-
+        for (HistoryValues data : dataObjects) {
             // turn your data into Entry objects
-            if (data instanceof HistoryValues) {
-                entries.add(new Entry(((HistoryValues) data).getTimeInMillis(), (float) ((HistoryValues) data).getPriceInUSD()));
-            }
+            entries.add(new Entry(data.getTimeInMillis(), (float) data.getPriceInUSD()));
         }
 
+        Collections.sort(entries, new EntryXComparator());
         LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
 
         LineData lineData = new LineData(dataSet);
