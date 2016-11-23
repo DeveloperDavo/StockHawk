@@ -7,13 +7,20 @@ import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.utils.EntryXComparator;
 import com.udacity.stockhawk.R;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,19 +29,19 @@ import butterknife.ButterKnife;
 
 public class DetailActivity extends AppCompatActivity {
 
-    public static final String KEY = "data";
+    public static final String HISTORY_VALUES_LIST = "data";
+    public static final String SYMBOL = "symbol";
     @BindView(R.id.chart)
     LineChart lineChart;
-
-    private HistoryValues[] data;
 
     /* Required empty constructor */
     public DetailActivity() {
     }
 
-    public static Intent newIntent(Context context, List<HistoryValues> data) {
+    public static Intent newIntent(Context context, List<HistoryValues> data, String symbol) {
         final Intent intent = new Intent(context, DetailActivity.class);
-        intent.putParcelableArrayListExtra(KEY, (ArrayList<? extends Parcelable>) data);
+        intent.putParcelableArrayListExtra(HISTORY_VALUES_LIST, (ArrayList<? extends Parcelable>) data);
+        intent.putExtra(SYMBOL, symbol);
         return intent;
     }
 
@@ -45,7 +52,22 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
-        List<HistoryValues> dataObjects = getIntent().getParcelableArrayListExtra(KEY);
+        final Bundle extras = getIntent().getExtras();
+
+        final YAxis axisLeft = lineChart.getAxisLeft();
+        final XAxis xAxis = lineChart.getXAxis();
+        final YAxis axisRight = lineChart.getAxisRight();
+
+        axisLeft.setDrawLabels(false);
+
+        xAxis.setTextSize(14);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setValueFormatter(new TimeFormatter());
+
+        axisRight.setTextSize(14);
+        axisRight.setValueFormatter(new PriceFormatter());
+
+        List<HistoryValues> dataObjects = extras.getParcelableArrayList(HISTORY_VALUES_LIST);
 
         List<Entry> entries = new ArrayList<>();
         for (HistoryValues data : dataObjects) {
@@ -54,11 +76,31 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         Collections.sort(entries, new EntryXComparator());
-        LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
+        LineDataSet dataSet = new LineDataSet(entries, extras.getString(SYMBOL)); // add entries to dataset
+        dataSet.setDrawValues(false);
 
         LineData lineData = new LineData(dataSet);
         lineChart.setData(lineData);
         lineChart.invalidate(); // refresh
 
+    }
+
+    public class PriceFormatter implements IAxisValueFormatter {
+
+        @Override
+        public String getFormattedValue(float value, AxisBase axis) {
+            DecimalFormat mFormat = new DecimalFormat("0.00");
+            return mFormat.format(value);
+        }
+    }
+
+    public class TimeFormatter implements IAxisValueFormatter {
+
+        @Override
+        public String getFormattedValue(float value, AxisBase axis) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis((long) value);
+            return new SimpleDateFormat("dd/MM/yy").format(calendar.getTime());
+        }
     }
 }

@@ -132,11 +132,12 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
             int adapterPosition = getAdapterPosition();
             cursor.moveToPosition(adapterPosition);
             int symbolColumn = cursor.getColumnIndex(Contract.Quote.COLUMN_SYMBOL);
-            clickHandler.onClick(cursor.getString(symbolColumn));
+            final String symbol = cursor.getString(symbolColumn);
+            clickHandler.onClick(symbol);
 
             final String history = cursor.getString(Contract.Quote.POSITION_HISTORY);
             final List<HistoryValues> data = convertToData(history);
-            final Intent intent = DetailActivity.newIntent(context, data);
+            final Intent intent = DetailActivity.newIntent(context, data, symbol);
             context.startActivity(intent);
         }
 
