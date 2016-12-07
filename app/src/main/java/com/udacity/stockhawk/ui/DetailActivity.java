@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -57,6 +58,8 @@ public class DetailActivity extends AppCompatActivity {
 
         final Bundle extras = getIntent().getExtras();
 
+        setUpActionBar();
+
         setAxesProperties();
 
         final LineDataSet dataSet = addEntriesToDataSet(extras);
@@ -65,6 +68,14 @@ public class DetailActivity extends AppCompatActivity {
 
         setLineChartData(dataSet);
 
+    }
+
+    private void setUpActionBar() {
+        final ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayShowTitleEnabled(false);
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private void setAxesProperties() {
