@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -31,6 +32,8 @@ public class DetailActivity extends AppCompatActivity {
 
     public static final String HISTORY_VALUES_LIST = "data";
     public static final String SYMBOL = "symbol";
+    public static final int TEXT_SIZE = 10;
+
     @BindView(R.id.chart)
     LineChart lineChart;
 
@@ -54,21 +57,44 @@ public class DetailActivity extends AppCompatActivity {
 
         final Bundle extras = getIntent().getExtras();
 
-        final YAxis axisLeft = lineChart.getAxisLeft();
+        setAxesProperties();
+
+        final LineDataSet dataSet = addEntriesToDataSet(extras);
+
+        setDataSetProperties(dataSet);
+
+        setLineChartData(dataSet);
+
+    }
+
+    private void setAxesProperties() {
+        setLeftAxisProperties();
+        setXAxisProperties();
+        setRightAxisProperties();
+    }
+
+    private void setLeftAxisProperties() {
+        final YAxis leftAxis = lineChart.getAxisLeft();
+        leftAxis.setDrawLabels(false);
+    }
+
+    private void setXAxisProperties() {
         final XAxis xAxis = lineChart.getXAxis();
-        final YAxis axisRight = lineChart.getAxisRight();
-
-        axisLeft.setDrawLabels(false);
-
-        xAxis.setTextSize(14);
+        xAxis.setTextSize(TEXT_SIZE);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setValueFormatter(new TimeFormatter());
+    }
 
-        axisRight.setTextSize(14);
-        axisRight.setValueFormatter(new PriceFormatter());
+    private void setRightAxisProperties() {
+        final YAxis rightAxis = lineChart.getAxisRight();
+        rightAxis.setTextSize(TEXT_SIZE);
+        rightAxis.setValueFormatter(new PriceFormatter());
+    }
 
+    @NonNull
+    private List<Entry> getEntries(Bundle extras) {
         List<HistoryValues> dataObjects = extras.getParcelableArrayList(HISTORY_VALUES_LIST);
-
+        assert dataObjects != null;
         List<Entry> entries = new ArrayList<>();
         for (HistoryValues data : dataObjects) {
             // turn your data into Entry objects
@@ -76,13 +102,27 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         Collections.sort(entries, new EntryXComparator());
-        LineDataSet dataSet = new LineDataSet(entries, extras.getString(SYMBOL)); // add entries to dataset
-        dataSet.setDrawValues(false);
+        return entries;
+    }
 
+    @NonNull
+    private LineDataSet addEntriesToDataSet(Bundle extras) {
+        return new LineDataSet(getEntries(extras), extras.getString(SYMBOL));
+    }
+
+    private void setDataSetProperties(LineDataSet dataSet) {
+        dataSet.setDrawCircles(false);
+        dataSet.setDrawFilled(true);
+        dataSet.setDrawValues(false);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+    }
+
+    private void setLineChartData(LineDataSet dataSet) {
         LineData lineData = new LineData(dataSet);
+        lineChart.getDescription().setEnabled(false);
+        lineChart.setAutoScaleMinMaxEnabled(true);
         lineChart.setData(lineData);
         lineChart.invalidate(); // refresh
-
     }
 
     public class PriceFormatter implements IAxisValueFormatter {
