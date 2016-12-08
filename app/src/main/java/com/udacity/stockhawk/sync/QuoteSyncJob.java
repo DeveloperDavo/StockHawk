@@ -71,7 +71,9 @@ public final class QuoteSyncJob {
                 Stock stock = quotes.get(symbol);
                 StockQuote quote = stock.getQuote();
 
+                // stock does not exist
                 if (null == stock.getName()) {
+                    PrefUtils.removeStock(context, symbol);
                     continue;
                 }
 
@@ -167,6 +169,5 @@ public final class QuoteSyncJob {
 
         }
     }
-
 
 }
