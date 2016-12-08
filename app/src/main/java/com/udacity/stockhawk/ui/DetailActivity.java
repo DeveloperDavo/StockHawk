@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
@@ -126,6 +127,9 @@ public class DetailActivity extends AppCompatActivity {
         dataSet.setDrawFilled(true);
         dataSet.setDrawValues(false);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        final int dataSetColor = ContextCompat.getColor(this, R.color.colorPrimary);
+        dataSet.setFillColor(dataSetColor);
+        dataSet.setColor(dataSetColor);
     }
 
     private void setLineChartData(LineDataSet dataSet) {
