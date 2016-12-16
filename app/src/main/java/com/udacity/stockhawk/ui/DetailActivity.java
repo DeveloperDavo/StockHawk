@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -38,6 +39,8 @@ public class DetailActivity extends AppCompatActivity {
 
     @BindView(R.id.chart)
     LineChart lineChart;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     /* Required empty constructor */
     public DetailActivity() {
@@ -72,6 +75,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setUpActionBar() {
+        setSupportActionBar(toolbar);
         final ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayShowTitleEnabled(false);
